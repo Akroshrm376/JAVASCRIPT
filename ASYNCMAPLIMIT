@@ -1,0 +1,46 @@
+async function mapAsyncLimit(arr, limit, asyncFn) {
+  let results = [];
+  let index = 0;
+
+  async function worker() {
+      console.log("Im a worker function ================")
+    while (index < arr.length) {
+      const currentIndex = index;
+      const value = arr[index];
+      index++;
+
+      results[currentIndex] = await asyncFn(value);
+    }
+    console.log("Ended a worker function ================")
+  }
+
+  let workers = [];
+  for (let i = 0; i < limit; i++) {
+      console.log("assigning work to worker  here ------")
+    workers.push(worker());
+  }
+   
+  console.log("workers status = ",workers)
+  await Promise.all(workers);
+  return results;
+}
+
+
+async function test() {
+  const nums = [1, 2, 3, 4, 5];
+  const result = await mapAsyncLimit(nums, 2, double);
+  console.log("Final Result:", result);
+}
+
+async function double(n) {
+      console.log("Im asynFunction************")
+    return new Promise(resolve => {
+      setTimeout(() => {
+        console.log("Processing:", n);
+        resolve(n * 2);
+      }, 1000);
+    });
+    console.log("Ended asynFunction************")
+  }
+
+test();
